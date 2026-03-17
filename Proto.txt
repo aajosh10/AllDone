@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllDone - Task Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Variables */
+        :root {
+            --bg-cream: #FAF8F4;
+            --sage-green: #C8E6C9;
+            --sage-dark: #81C784;
+            --warm-peach: #FFCCBC;
+            --lavender: #E1BEE7;
+            --sky-blue: #BBDEFB;
+            
+            --text-main: #2C2C2C;
+            --text-muted: #757575;
+            
+            --done-green: #43A047;
+            --done-text: #2E7D32;
+            --started-amber: #FF8F00;
+            
+            --urgent-bg: #FFCCBC;
+            --urgent-text: #BF360C;
+            --career-bg: #BBDEFB;
+            --career-text: #0D47A1;
+            --goodness-bg: #E1BEE7;
+            --goodness-text: #4A148C;
+            --personal-bg: #DCEDC8;
+            --personal-text: #33691E;
+
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-pill: 999px;
+            
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Global Resets */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #ECECEC; /* Outer bg for desktop contrast */
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* App Container */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh; /* Mobile view height */
+            background-color: var(--bg-cream);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        /* Scrollable Area */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 100px 20px; /* Bottom padding for fixed nav */
+            scrollbar-width: none; /* Firefox */
+        }
+        .content-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        /* Sticky Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(to bottom, var(--bg-cream) 85%, transparent 100%);
+            padding: 24px 20px 16px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-area .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .logo-area .date {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .score-pill {
+            background-color: var(--sage-green);
+            color: var(--done-text);
+            min-width: 80px;
+        }
+
+        .streak-pill {
+            background-color: #FFF3E0;
+            color: #E65100;
+        }
+
+        /* Carry Forward Banner */
+        .banner {
+            background-color: var(--warm-peach);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 24px;
+            position: relative;
+            animation: slideIn 0.5s ease backwards;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .banner h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #D84315;
+        }
+
+        .banner-task {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #BF360C;
+        }
+
+        .banner-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .btn-roll {
+            background: rgba(255,255,255,0.6);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            color: #BF360C;
+            cursor: pointer;
+        }
+
+        .btn-dismiss {
+            background: none;
+            border: none;
+            color: #D84315;
+            font-size: 13px;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        /* Routines Panel */
+        .routines-panel {
+            background-color: var(--lavender);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-subtle);
+            animation: slideIn 0.6s ease backwards;
+            animation-delay: 0.1s;
+        }
+
+        .routine-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Tasks Section */
+        .tasks-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Task Item (Shared between Routines & Tasks) */
+        .task-row {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-subtle);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            
+            /* Staggered load animation */
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+        
+        .routines-panel .task-row {
+            background-color: rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .task-row:active {
+            transform: scale(0.98);
+        }
+
+        /* Tick Mechanics */
+        .tick-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #E0E0E0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .tick-svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0;
+            fill: none;
+            stroke: white;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 24;
+            stroke-dashoffset: 24;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        
+        /* Tag Colors */
+        .tag-urgent { background: var(--urgent-bg); color: var(--urgent-text); }
+        .tag-career { background: var(--career-bg); color: var(--career-text); }
+        .tag-goodness { background: var(--goodness-bg); color: var(--goodness-text); }
+        
+        /* State Modifiers */
+        /* Untouched: Default state handled above */
+        
+        /* Started */
+        .state-started .tick-circle {
+            border-color: var(--started-amber);
+            transform: scale(1.1);
+        }
+        .state-started .task-title {
+            color: var(--started-amber);
+            font-weight: 700;
+        }
+
+        /* Done */
+        .state-done .tick-circle {
+            background-color: var(--done-green);
+            border-color: var(--done-green);
+        }
+        .state-done .tick-svg {
+            opacity: 1;
+            animation: drawLine 0.4s ease forwards;
+            animation-delay: 0.1s;
+        }
+        .state-done .task-title {
+            color: var(--done-text);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .state-done .task-row {
+            opacity: 0.8;
+            background-color: #F8FBF8;
+        }
+
+        /* End of Day Summary */
+        .end-summary {
+            margin-top: 40px;
+            background-color: var(--sage-green);
+            border-radius: var(--radius-lg);
+            padding: 32px 20px;
+            text-align: center;
+            box-shadow: var(--shadow-float);
+        }
+        .end-summary h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            color: var(--done-text);
+            margin-bottom: 8px;
+        }
+        .end-summary p {
+            font-weight: 700;
+            color: #33691E;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 20px 24px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            z-index: 20;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            z-index: 2;
+        }
+
+        /* Active Nav State */
+        .nav-item.active {
+            color: var(--done-text);
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--sage-green);
+            border-radius: var(--radius-pill);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+        }
+
+        .nav-item.active::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .nav-item span { z-index: 2; }
+
+        /* --- Animations --- */
+        
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Spring Pop Animation for state change */
+        .pop-anim {
+            animation: springPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes springPop {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.8); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Pure CSS Confetti implementation */
+        .confetti-wrapper {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .confetti-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        @keyframes burst {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        /* Helper classes for JS injection delays */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <header class="header">
+        <div class="header-top">
+            <div class="logo-area">
+                <h1 class="logo">AllDone</h1>
+                <div class="date">Thursday, Oct 12</div>
+            </div>
+            <div class="header-stats">
+                <div class="pill score-pill" id="headerScore">Score: 72%</div>
+                <div class="pill streak-pill">🔥 6 days</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="content-scroll">
+        
+        <div class="banner" id="carryForwardBanner">
+            <h3>Carry forward from yesterday?</h3>
+            <div class="banner-task">
+                <input type="checkbox" checked> Finalize Q4 budget
+            </div>
+            <div class="banner-task">
+                <input type="checkbox" checked> Sync with Design team
+            </div>
+            <div class="banner-actions">
+                <button class="btn-roll" onclick="dismissBanner()">Roll forward</button>
+                <button class="btn-dismiss" onclick="dismissBanner()">Dismiss</button>
+            </div>
+        </div>
+
+        <div class="routines-panel">
+            <div class="section-title">ROUTINES</div>
+            <div class="routine-list">
+                <div class="task-row state-untouched">
+                    <div class="tick-circle">
+                        <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Walk 20 mins</div>
+                    </div>
+                </div>
+                <div class="task-row state-untouched">
+                    <div class="tick-circle">
+                        <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Read 5 pages</div>
+                    </div>
+                </div>
+                <div class="task-row state-untouched">
+                    <div class="tick-circle">
+                        <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Read all emails</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">TODAY</div>
+        <div class="tasks-section">
+            
+            <div class="task-row state-done delay-1">
+                <div class="tick-circle">
+                    <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path><path d="M5 18l4 4L19 12" style="stroke-dasharray: 24; stroke-dashoffset: 24; animation: drawLine 0.4s ease forwards 0.3s;"></path></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">Local MOJ</div>
+                    <div class="task-meta"><span class="tag tag-urgent">Urgent</span></div>
+                </div>
+            </div>
+
+            <div class="task-row state-done delay-2">
+                <div class="tick-circle">
+                    <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path><path d="M5 18l4 4L19 12" style="stroke-dasharray: 24; stroke-dashoffset: 24; animation: drawLine 0.4s ease forwards 0.3s;"></path></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">MBR deck</div>
+                    <div class="task-meta"><span class="tag tag-career">Great for Career</span></div>
+                </div>
+            </div>
+
+            <div class="task-row state-started delay-3">
+                <div class="tick-circle">
+                    <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">1-pager for AI Notifications</div>
+                    <div class="task-meta"><span class="tag tag-career">Great for Career</span></div>
+                </div>
+            </div>
+
+            <div class="task-row state-untouched delay-4">
+                <div class="tick-circle">
+                    <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">Governance doc</div>
+                    <div class="task-meta"><span class="tag tag-goodness">Long-term Goodness</span></div>
+                </div>
+            </div>
+
+            <div class="task-row state-untouched delay-5">
+                <div class="tick-circle">
+                    <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">Seasonal MOJ rollout</div>
+                    <div class="task-meta"><span class="tag tag-career">Great for Career</span></div>
+                </div>
+            </div>
+
+            <div class="task-row state-untouched delay-6">
+                <div class="tick-circle">
+                    <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">iOS scorecard</div>
+                    <div class="task-meta"><span class="tag tag-urgent">Urgent</span></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="end-summary">
+            <h2>72%</h2>
+            <p>Score · 🔥 6-day streak</p>
+        </div>
+
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="switchNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 3L4 9v12h16V9l-8-6zm6 16h-3v-6H9v6H6v-9l6-4.5 6 4.5v9z"/></svg>
+            <span>Today</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchNav(this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+            <span>Settings</span>
+        </a>
+    </nav>
+</div>
+
+<script>
+    // State machine for tasks
+    const STATES = ['state-untouched', 'state-started', 'state-done'];
+    const SCORE_EL = document.getElementById('headerScore');
+    let currentScore = 72; // Starting state based on prompt
+
+    // Initialize all tasks
+    document.querySelectorAll('.task-row').forEach(row => {
+        row.addEventListener('click', function() {
+            // Find current state
+            let currentStateIdx = 0;
+            STATES.forEach((state, idx) => {
+                if (this.classList.contains(state)) currentStateIdx = idx;
+            });
+
+            // Remove old state
+            this.classList.remove(STATES[currentStateIdx]);
+
+            // Calculate new state (cycle forward)
+            let newStateIdx = (currentStateIdx + 1) % STATES.length;
+            this.classList.add(STATES[newStateIdx]);
+
+            // Animate Tick Spring Pop
+            const tick = this.querySelector('.tick-circle');
+            tick.classList.remove('pop-anim');
+            void tick.offsetWidth; // Trigger reflow to restart animation
+            tick.classList.add('pop-anim');
+
+            // Trigger Confetti if entering 'Done'
+            if (STATES[newStateIdx] === 'state-done') {
+                triggerConfetti(tick);
+                updateScore(1);
+            } else if (STATES[currentStateIdx] === 'state-done') {
+                updateScore(-1); // Reverted from done
+            }
+        });
+    });
+
+    function triggerConfetti(parentEl) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'confetti-wrapper';
+        
+        // Colors from our pastel palette
+        const colors = ['#C8E6C9', '#FFCCBC', '#E1BEE7', '#BBDEFB', '#43A047'];
+        
+        for (let i = 0; i < 8; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'confetti-particle';
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Random direction
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 20 + Math.random() * 30; // 20px to 50px spread
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--dx', `${dx}px`);
+            particle.style.setProperty('--dy', `${dy}px`);
+            
+            // Randomize speed slightly
+            const duration = 0.5 + Math.random() * 0.3;
+            particle.style.animation = `burst ${duration}s ease-out forwards`;
+            
+            wrapper.appendChild(particle);
+        }
+        
+        parentEl.appendChild(wrapper);
+        
+        // Cleanup DOM after animation
+        setTimeout(() => {
+            if(parentEl.contains(wrapper)) parentEl.removeChild(wrapper);
+        }, 1000);
+    }
+
+    // Score updating logic (Visual fluff)
+    function updateScore(change) {
+        currentScore += (change * 4); // Arbitrary increment for demo
+        if(currentScore > 100) currentScore = 100;
+        
+        // Width expansion visual trick
+        SCORE_EL.style.transform = "scale(1.1)";
+        setTimeout(() => { SCORE_EL.style.transform = "scale(1)"; }, 200);
+        SCORE_EL.innerText = `Score: ${currentScore}%`;
+        
+        // Update bottom card too
+        document.querySelector('.end-summary h2').innerText = `${currentScore}%`;
+    }
+
+    // Dismiss carry-forward banner
+    function dismissBanner() {
+        const banner = document.getElementById('carryForwardBanner');
+        banner.style.transition = "all 0.4s ease";
+        banner.style.opacity = "0";
+        banner.style.transform = "translateX(50px)";
+        
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 400);
+    }
+
+    // Bottom Nav Active State Switching
+    function switchNav(el) {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        el.classList.add('active');
+    }
+</script>
+</body>
+</html>

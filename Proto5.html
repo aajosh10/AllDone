@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AllDone | Double Tick Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cream: #FAF8F4;
+            --silk-blue: #D9E9F7; /* Powder blue silk for featured cards */
+            --sage: #DDEEE0;
+            --lavender: #EBE0F0;
+            --peach: #F9E5DE;
+            --border: rgba(0,0,0,0.06);
+            --text-main: #1A1A1A;
+            --text-muted: #8E8E8E;
+            
+            --done-green: #2E7D32; /* Rich Green for ticks and text */
+            --started-amber: #D67D00;
+            
+            --radius-card: 16px;
+            --radius-pill: 100px;
+            --shadow: 0 1px 12px rgba(0,0,0,0.04);
+            --ease-silk: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Direction Adjustments */
+        body.dir-hepburn { --text-main: #000; }
+        body.dir-editor { --radius-card: 2px; --shadow: none; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            background-color: #F4F4F4;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+        }
+
+        .direction-switcher {
+            position: fixed;
+            top: 12px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            padding: 4px;
+            border-radius: 100px;
+            border: 0.5px solid var(--border);
+            display: flex;
+        }
+        .direction-switcher button {
+            border: none; padding: 6px 14px; border-radius: 100px;
+            font-size: 10px; font-weight: 700; cursor: pointer;
+            background: transparent; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .direction-switcher button.active { background: var(--text-main); color: white; }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background: var(--cream);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+        }
+
+        header {
+            padding: 48px 24px 16px;
+            background: var(--cream);
+            z-index: 50;
+        }
+        .logo { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; font-style: italic; }
+        
+        .screen {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 24px 120px;
+            display: none;
+            animation: fadeIn 0.4s var(--ease-silk) forwards;
+        }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Featured Card */
+        .featured-card {
+            background: var(--silk-blue);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            margin: 8px 0 24px;
+            border: 0.5px solid rgba(0,0,0,0.03);
+            transition: var(--ease-silk);
+        }
+        .featured-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; }
+        .featured-num { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 800; line-height: 1; margin-top: 8px; }
+
+        .section-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px;
+            color: var(--text-muted); margin: 32px 0 16px;
+        }
+
+        /* Banner */
+        .banner {
+            background: var(--peach);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            margin-bottom: 24px;
+            animation: slideDown 0.5s var(--ease-silk);
+        }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Tasks: FADE & ITALIC (NO STRIKETHROUGH) */
+        .task-card {
+            background: white;
+            border-radius: var(--radius-card);
+            padding: 18px;
+            margin-bottom: 10px;
+            border: 0.5px solid var(--border);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--ease-silk);
+        }
+        .task-name { font-size: 15px; font-weight: 500; transition: 0.4s; }
+
+        .tick-circle {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 1.2px solid rgba(0,0,0,0.12);
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s var(--ease-silk);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        /* Tick SVG Dynamics */
+        .tick-svg {
+            width: 14px; height: 14px; stroke-width: 3.5; 
+            fill: none;
+        }
+        /* Default Neutral State */
+        .tick-svg path { stroke: rgba(0,0,0,0.12); opacity: 0; transition: opacity 0.3s; }
+
+        /* State: STARTED */
+        .state-started .task-name { color: var(--started-amber); font-weight: 700; }
+        .state-started .tick-circle { border-color: var(--started-amber); border-width: 2px; }
+        .state-started .tick-svg path:first-child { stroke: var(--started-amber); opacity: 1; } /* Single Tick Amber */
+
+        /* State: DONE */
+        .state-done { opacity: 0.6; } /* Faded but readable */
+        .state-done .task-name { font-style: italic; color: var(--done-green); } /* Done Text Green */
+        .state-done .tick-circle { background: rgba(46, 125, 50, 0.1); border-color: var(--done-green); transform: scale(1.1); } /* Done Circle Faint Green Wash */
+        
+        .state-done .tick-svg path { stroke: var(--done-green); opacity: 1; } /* Double Tick Green */
+        .state-done .tick-svg path:last-child { animation: drawDbl 0.5s ease forwards; }
+        @keyframes drawDbl { from { stroke-dasharray: 20; stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+
+        /* Smaller Confetti Pearls */
+        .dot { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--text-main); pointer-events: none; opacity: 0; }
+        @keyframes floatOut { 
+            0% { transform: translate(0,0); opacity: 1; } 
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; } 
+        }
+
+        /* Nav */
+        nav {
+            position: absolute; bottom: 0; width: 100%; height: 85px;
+            background: var(--cream); border-top: 0.5px solid var(--border);
+            display: flex; justify-content: space-around; padding: 0 30px 15px;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; font-size: 10px; font-weight: 700; color: var(--text-muted);
+            cursor: pointer; position: relative; z-index: 1; padding: 10px 20px;
+        }
+        .nav-item.active { color: var(--text-main); }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: 15%; left: 0; right: 0; bottom: 15%;
+            background: var(--lavender); border-radius: var(--radius-pill); z-index: -1;
+            animation: silkGrow 0.3s var(--ease-silk);
+        }
+        @keyframes silkGrow { from { transform: scaleX(0.8); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+
+        /* Dashboard */
+        .heat-map { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 24px; }
+        .heat-cell { aspect-ratio: 1; border-radius: 3px; background: rgba(0,0,0,0.03); }
+    </style>
+</head>
+<body class="dir-hepburn">
+
+    <div class="direction-switcher">
+        <button class="active" onclick="setDir('hepburn', this)">Hepburn</button>
+        <button onclick="setDir('garden', this)">Garden</button>
+        <button onclick="setDir('editor', this)">Editor</button>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <div class="logo">AllDone.</div>
+        </header>
+
+        <main class="screen active" id="sc-today">
+            
+            <div class="featured-card">
+                <div class="featured-label">Completed Today</div>
+                <div class="featured-num" id="score-val">72%</div>
+                <div style="font-size: 12px; opacity: 0.6; margin-top: 8px;">🔥 6 DAY STREAK</div>
+            </div>
+
+            <div class="banner" id="cbanner">
+                <div style="font-family: 'Playfair Display'; font-style: italic; font-size: 15px; margin-bottom: 8px;">from yesterday</div>
+                <div style="font-size: 13px; margin-bottom: 12px; color: rgba(0,0,0,0.6);">2 tasks waiting for you.</div>
+                <button onclick="dismiss()" style="background: var(--text-main); color: white; border: none; padding: 8px 16px; border-radius: 100px; font-size: 11px; font-weight: 700; cursor: pointer;">Roll Forward</button>
+            </div>
+
+            <div class="task-card" style="background: var(--lavender); border: none; border-radius: 12px; padding: 14px; flex-direction: row; gap: 12px;">
+                <div style="font-size: 18px;">✨</div>
+                <div>
+                    <div style="font-size: 13px; font-weight: 700;">routines</div>
+                    <div style="font-size: 12px; opacity: 0.7; margin-top: 2px;">1 of 3 finished</div>
+                </div>
+            </div>
+
+            <div class="section-label">today</div>
+            <div id="task-container">
+                <div class="task-card state-done">
+                    <div class="tick-circle" onclick="step(this)">
+                        <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/><path d="M5 18l4 4L19 12"/></svg>
+                    </div>
+                    <div class="task-name">Local MOJ Strategy</div>
+                </div>
+                <div class="task-card state-started">
+                    <div class="tick-circle" onclick="step(this)">
+                        <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/><path d="M5 18l4 4L19 12"/></svg>
+                    </div>
+                    <div class="task-name">MBR deck refinement</div>
+                </div>
+                <div class="task-card">
+                    <div class="tick-circle" onclick="step(this)">
+                        <svg class="tick-svg" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/><path d="M5 18l4 4L19 12"/></svg>
+                    </div>
+                    <div class="task-name">Governance 1-pager</div>
+                </div>
+            </div>
+        </main>
+
+        <main class="screen" id="sc-dashboard">
+            <div class="section-label">Your Journey</div>
+            <div class="heat-map" id="hmap"></div>
+            <div class="featured-card" style="background: var(--sage);">
+                <div class="featured-label">Averages</div>
+                <div class="featured-num" style="font-size: 32px;">61% Score</div>
+            </div>
+        </main>
+
+        <main class="screen" id="sc-settings">
+            <div class="section-label">Space</div>
+            <div style="padding: 20px 0; border-bottom: 0.5px solid var(--border); font-size: 14px; font-weight: 500;">Export to Sheet</div>
+            <div style="padding: 20px 0; border-bottom: 0.5px solid var(--border); font-size: 14px; font-weight: 500; color: var(--text-muted);">Sign Out</div>
+        </main>
+
+        <nav>
+            <div class="nav-item active" onclick="tab('today', this)">Today</div>
+            <div class="nav-item" onclick="tab('dashboard', this)">Journey</div>
+            <div class="nav-item" onclick="tab('settings', this)">Settings</div>
+        </nav>
+    </div>
+
+    <script>
+        function setDir(m, b) {
+            document.body.className = 'dir-' + m;
+            document.querySelectorAll('.direction-switcher button').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+        }
+
+        function tab(id, el) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('sc-' + id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            if(id === 'dashboard') drawMap();
+        }
+
+        function step(el) {
+            const card = el.closest('.task-card');
+            if (card.classList.contains('state-done')) {
+                card.classList.remove('state-done');
+            } else if (card.classList.contains('state-started')) {
+                card.classList.replace('state-started', 'state-done');
+                pop(el);
+            } else {
+                card.classList.add('state-started');
+            }
+        }
+
+        function pop(el) {
+            for(let i=0; i<8; i++) {
+                const d = document.createElement('div');
+                d.className = 'dot';
+                const angle = (i/8) * Math.PI * 2;
+                const x = Math.cos(angle) * 30 + 'px';
+                const y = Math.sin(angle) * 30 + 'px';
+                d.style.setProperty('--x', x);
+                d.style.setProperty('--y', y);
+                d.style.left = '50%'; d.style.top = '50%';
+                d.style.animation = 'floatOut 0.8s ease-out forwards';
+                el.appendChild(d);
+                setTimeout(() => d.remove(), 800);
+            }
+        }
+
+        function dismiss() {
+            const b = document.getElementById('cbanner');
+            b.style.transition = '0.4s';
+            b.style.opacity = '0';
+            b.style.transform = 'translateY(-10px)';
+            setTimeout(() => b.remove(), 400);
+        }
+
+        function drawMap() {
+            const h = document.getElementById('hmap');
+            h.innerHTML = '';
+            for(let i=0; i<35; i++) {
+                const c = document.createElement('div');
+                c.className = 'heat-cell';
+                const op = [0.05, 0.2, 0.5, 0.8][Math.floor(Math.random()*4)];
+                c.style.background = `rgba(46, 125, 50, ${op})`; /* Green for dashboard */
+                h.appendChild(c);
+            }
+        }
+    </script>
+</body>
+</html>

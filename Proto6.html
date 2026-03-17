@@ -1,0 +1,967 @@
+# AllDone — Full Codebase Reference
+> Mobile task tracker app. React + Vite + Tailwind CSS + TypeScript.
+> Aesthetic: "Audrey Hepburn meets Flow App" — timeless elegance, muted pastels, editorial typography.
+> Fonts: Playfair Display (display), DM Sans (body). Three visual directions: Hepburn, Garden Party, Editor.
+---
+## Design System
+### index.css
+```css
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400;1,9..40,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400;1,500;1,600;1,700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    /* === Direction A: The Hepburn (default) === */
+    --background: 40 33% 97%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 125 20% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 95%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 40 12% 93%;
+    --muted-foreground: 0 0% 48%;
+    --accent: 280 25% 88%;
+    --accent-foreground: 280 30% 25%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 92%;
+    --input: 0 0% 90%;
+    --ring: 125 20% 42%;
+    --radius: 1rem;
+    /* Palette tokens */
+    --sage: 122 28% 84%;
+    --sage-mid: 122 30% 66%;
+    --sage-strong: 122 40% 45%;
+    --sage-deep: 122 38% 33%;
+    --peach: 24 70% 90%;
+    --lavender: 280 30% 89%;
+    --sky: 210 55% 88%;
+    --cream: 40 33% 97%;
+    --personal-bg: 88 40% 88%;
+    --personal-text: 93 40% 20%;
+    /* Tag tokens */
+    --tag-urgent-bg: 24 70% 90%;
+    --tag-urgent-text: 24 80% 28%;
+    --tag-career-bg: 210 55% 88%;
+    --tag-career-text: 216 60% 22%;
+    --tag-longterm-bg: 280 30% 89%;
+    --tag-longterm-text: 280 50% 20%;
+    --tag-personal-bg: 88 40% 88%;
+    --tag-personal-text: 93 40% 20%;
+    /* State tokens */
+    --done-fill: 122 52% 45%;
+    --done-text: 122 38% 33%;
+    --started-border: 28 100% 45%;
+    --started-text: 28 85% 40%;
+    /* Shadows */
+    --shadow-card: 0 1px 8px rgba(0,0,0,0.05);
+    --shadow-elevated: 0 2px 16px rgba(0,0,0,0.06);
+    /* Animation speeds */
+    --anim-task-duration: 0.5s;
+    --anim-task-stagger: 70ms;
+    --anim-tick-duration: 0.25s;
+    --anim-nav-duration: 0.2s;
+    /* Typography */
+    --display-weight: 700;
+    --display-tracking: -0.5px;
+    --display-size: 1.75rem;
+    /* Border */
+    --card-border: 0.5px solid rgba(0,0,0,0.08);
+    --card-radius: 16px;
+    --pill-radius: 100px;
+    --tag-radius: 100px;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  /* === Direction B: Garden Party === */
+  .direction-garden {
+    --background: 38 40% 97%;
+    --foreground: 20 10% 15%;
+    --sage: 122 35% 82%;
+    --peach: 20 80% 89%;
+    --lavender: 285 35% 87%;
+    --sky: 205 60% 87%;
+    --card-radius: 20px;
+    --tag-radius: 12px;
+    --display-weight: 600;
+    --display-tracking: -0.3px;
+    --display-size: 1.7rem;
+    --anim-task-duration: 0.45s;
+    --anim-task-stagger: 60ms;
+    --anim-tick-duration: 0.3s;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.04);
+    --muted-foreground: 20 8% 52%;
+    --border: 20 10% 91%;
+  }
+  /* === Direction C: The Editor === */
+  .direction-editor {
+    --background: 40 20% 97%;
+    --foreground: 0 0% 8%;
+    --sage: 122 18% 87%;
+    --peach: 24 50% 92%;
+    --lavender: 280 18% 91%;
+    --sky: 210 35% 91%;
+    --card-radius: 12px;
+    --tag-radius: 4px;
+    --pill-radius: 6px;
+    --display-weight: 400;
+    --display-tracking: -0.8px;
+    --display-size: 1.65rem;
+    --anim-task-duration: 0.35s;
+    --anim-task-stagger: 50ms;
+    --anim-tick-duration: 0.2s;
+    --shadow-card: 0 0 0 0.5px rgba(0,0,0,0.08);
+    --shadow-elevated: 0 0 0 0.5px rgba(0,0,0,0.12);
+    --muted-foreground: 0 0% 42%;
+    --border: 0 0% 88%;
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-muted text-foreground;
+    font-family: 'DM Sans', sans-serif;
+  }
+}
+@layer components {
+  .label-caps {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground) / 0.55);
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+}
+/* === Keyframes === */
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); max-height: 0; }
+  to { opacity: 1; transform: translateY(0); max-height: 200px; }
+}
+@keyframes slideUp {
+  from { opacity: 1; transform: translateY(0); max-height: 200px; }
+  to { opacity: 0; transform: translateY(-20px); max-height: 0; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes burst {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+  100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+}
+@keyframes popScale {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1.05); }
+}
+@keyframes cellFade {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes screenFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+```
+### tailwind.config.ts
+```ts
+import type { Config } from "tailwindcss";
+export default {
+  darkMode: ["class"],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  prefix: "",
+  theme: {
+    container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
+    extend: {
+      fontFamily: {
+        display: ['"Playfair Display"', 'serif'],
+        body: ['"DM Sans"', 'sans-serif'],
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
+        secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
+        destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },
+        muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
+        accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
+        popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
+        card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+        sage: { DEFAULT: "hsl(var(--sage))", mid: "hsl(var(--sage-mid))", strong: "hsl(var(--sage-strong))", deep: "hsl(var(--sage-deep))" },
+        peach: "hsl(var(--peach))",
+        lavender: "hsl(var(--lavender))",
+        sky: "hsl(var(--sky))",
+        cream: "hsl(var(--cream))",
+        "tag-urgent": { bg: "hsl(var(--tag-urgent-bg))", text: "hsl(var(--tag-urgent-text))" },
+        "tag-career": { bg: "hsl(var(--tag-career-bg))", text: "hsl(var(--tag-career-text))" },
+        "tag-longterm": { bg: "hsl(var(--tag-longterm-bg))", text: "hsl(var(--tag-longterm-text))" },
+        "tag-personal": { bg: "hsl(var(--tag-personal-bg))", text: "hsl(var(--tag-personal-text))" },
+        "done-fill": "hsl(var(--done-fill))",
+        "done-text": "hsl(var(--done-text))",
+        "started-border": "hsl(var(--started-border))",
+        "started-text": "hsl(var(--started-text))",
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))", foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))", "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))", "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))", ring: "hsl(var(--sidebar-ring))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
+        "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
+```
+---
+## Pages
+### src/pages/Index.tsx
+```tsx
+import { useState } from "react";
+import BottomNav from "@/components/BottomNav";
+import type { Tab } from "@/components/BottomNav";
+import DirectionSwitcher from "@/components/DirectionSwitcher";
+import type { Direction } from "@/components/DirectionSwitcher";
+import TodayScreen from "@/components/TodayScreen";
+import DashboardScreen from "@/components/DashboardScreen";
+import SettingsScreen from "@/components/SettingsScreen";
+const directionClass: Record<Direction, string> = {
+  hepburn: "",
+  garden: "direction-garden",
+  editor: "direction-editor",
+};
+const Index = () => {
+  const [tab, setTab] = useState<Tab>("today");
+  const [direction, setDirection] = useState<Direction>("hepburn");
+  return (
+    <div className={`max-w-[420px] mx-auto min-h-screen relative pb-24 ${directionClass[direction]}`}
+      style={{ background: "hsl(var(--background))", boxShadow: "0 0 60px rgba(0,0,0,0.04)" }}
+    >
+      <DirectionSwitcher active={direction} onChange={setDirection} />
+      <div key={`${tab}-${direction}`} style={{ animation: "screenFade 0.2s ease both" }}>
+        {tab === "today" && <TodayScreen />}
+        {tab === "dashboard" && <DashboardScreen />}
+        {tab === "settings" && <SettingsScreen />}
+      </div>
+      <BottomNav active={tab} onChange={setTab} />
+    </div>
+  );
+};
+export default Index;
+```
+---
+## Components
+### src/components/DirectionSwitcher.tsx
+```tsx
+type Direction = "hepburn" | "garden" | "editor";
+const labels: Record<Direction, { name: string; subtitle: string }> = {
+  hepburn: { name: "The Hepburn", subtitle: "Maximum elegance" },
+  garden: { name: "Garden Party", subtitle: "Warm & playful" },
+  editor: { name: "The Editor", subtitle: "Typographic precision" },
+};
+const DirectionSwitcher = ({ active, onChange }: { active: Direction; onChange: (d: Direction) => void }) => (
+  <div
+    className="flex gap-1.5 px-5 py-3 sticky top-0 z-50"
+    style={{ background: "hsl(var(--background) / 0.9)", backdropFilter: "blur(16px)", borderBottom: "0.5px solid rgba(0,0,0,0.05)" }}
+  >
+    {(["hepburn", "garden", "editor"] as Direction[]).map((d) => (
+      <button
+        key={d}
+        onClick={() => onChange(d)}
+        className={`flex-1 py-2 text-center transition-all duration-200 ${
+          active === d
+            ? "bg-card text-foreground/80"
+            : "text-muted-foreground/35 hover:text-muted-foreground/55"
+        }`}
+        style={{
+          borderRadius: "var(--pill-radius)",
+          boxShadow: active === d ? "var(--shadow-card)" : "none",
+          border: active === d ? "var(--card-border)" : "none",
+        }}
+      >
+        <div className="text-[0.68rem] font-semibold">{labels[d].name}</div>
+        <div className="text-[0.52rem] opacity-50 mt-0.5">{labels[d].subtitle}</div>
+      </button>
+    ))}
+  </div>
+);
+export default DirectionSwitcher;
+export type { Direction };
+```
+### src/components/TodayScreen.tsx
+```tsx
+import { useState, useCallback, useMemo } from "react";
+import CarryForwardBanner from "@/components/CarryForwardBanner";
+import RoutineItem from "@/components/RoutineItem";
+import TaskRow from "@/components/TaskRow";
+import type { TaskData, TaskState } from "@/components/TaskRow";
+const initialTasks: TaskData[] = [
+  { id: "1", title: "Local MOJ", tag: "urgent", tagLabel: "Urgent", state: "done", time: "9:00 AM" },
+  { id: "2", title: "MBR deck", tag: "career", tagLabel: "Great for Career", state: "done" },
+  { id: "3", title: "1-pager for AI Notifications", tag: "career", tagLabel: "Great for Career", state: "started", time: "11:30 AM" },
+  { id: "4", title: "Governance doc", tag: "longterm", tagLabel: "Long-term Goodness", state: "untouched" },
+  { id: "5", title: "Seasonal MOJ rollout", tag: "career", tagLabel: "Great for Career", state: "untouched" },
+  { id: "6", title: "iOS scorecard", tag: "urgent", tagLabel: "Urgent", state: "untouched", time: "4:00 PM" },
+];
+const stateOrder: TaskState[] = ["untouched", "started", "done"];
+const TodayScreen = () => {
+  const [tasks, setTasks] = useState(initialTasks);
+  const [routines, setRoutines] = useState([
+    { label: "Walk 20 mins", done: false },
+    { label: "Read 5 pages", done: false },
+    { label: "Read all emails", done: false },
+  ]);
+  const toggleTask = useCallback((id: string) => {
+    setTasks((prev) => prev.map((t) =>
+      t.id === id ? { ...t, state: stateOrder[(stateOrder.indexOf(t.state) + 1) % 3] } : t
+    ));
+  }, []);
+  const toggleRoutine = useCallback((i: number) => {
+    setRoutines((prev) => prev.map((r, idx) => idx === i ? { ...r, done: !r.done } : r));
+  }, []);
+  const score = useMemo(() => {
+    const total = tasks.length + routines.length;
+    let c = 0;
+    tasks.forEach((t) => { if (t.state === "done") c++; else if (t.state === "started") c += 0.3; });
+    routines.forEach((r) => { if (r.done) c++; });
+    return Math.round((c / total) * 100);
+  }, [tasks, routines]);
+  const doneUrgent = tasks.filter((t) => t.tag === "urgent" && t.state === "done").length;
+  const routinesDone = routines.filter((r) => r.done).length;
+  const dateStr = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  return (
+    <div>
+      {/* Header */}
+      <header
+        className="px-5 pt-6 pb-4 sticky top-0 z-40"
+        style={{ background: "hsl(var(--background))", borderBottom: "0.5px solid rgba(0,0,0,0.05)" }}
+      >
+        <div className="flex justify-between items-baseline mb-3">
+          <h1
+            className="font-display leading-none text-foreground"
+            style={{ fontSize: "var(--display-size)", fontWeight: "var(--display-weight)", letterSpacing: "var(--display-tracking)" }}
+          >
+            AllDone
+          </h1>
+          <span className="text-[0.7rem] text-muted-foreground/50 font-medium">{dateStr}</span>
+        </div>
+        <div className="flex gap-2">
+          <span
+            className="px-3 py-1 text-[0.68rem] font-semibold bg-sage/50 text-done-text transition-all duration-500"
+            style={{ borderRadius: "var(--pill-radius)" }}
+          >
+            Score: {score}%
+          </span>
+          <span
+            className="px-3 py-1 text-[0.68rem] font-semibold bg-peach/50 text-started-text"
+            style={{ borderRadius: "var(--pill-radius)" }}
+          >
+            🔥 6 days
+          </span>
+        </div>
+      </header>
+      <div className="px-5 pt-4">
+        {/* Completion card */}
+        <div
+          className="mb-5 p-5 text-center"
+          style={{
+            background: "linear-gradient(135deg, hsl(var(--sky) / 0.45), hsl(var(--sky) / 0.25))",
+            borderRadius: "var(--card-radius)",
+            border: "var(--card-border)",
+            animation: "slideInUp 0.5s ease-out both",
+          }}
+        >
+          <div
+            className="font-display leading-none text-foreground/80 mb-1"
+            style={{ fontSize: "3.2rem", fontWeight: 600, letterSpacing: "-1px" }}
+          >
+            {score}%
+          </div>
+          <div className="font-display italic text-foreground/40" style={{ fontSize: "0.82rem", letterSpacing: "0.01em" }}>
+            today's completion
+          </div>
+        </div>
+        <CarryForwardBanner />
+        {/* Routines */}
+        <div
+          className="mb-7 p-4"
+          style={{
+            background: "hsl(var(--lavender) / 0.4)",
+            borderRadius: "var(--card-radius)",
+            border: "var(--card-border)",
+            animation: "slideInUp 0.5s ease-out 0.05s both",
+          }}
+        >
+          <div className="flex justify-between items-center mb-3">
+            <span className="label-caps !mb-0">routines</span>
+            <span className="text-[0.68rem] text-muted-foreground/40 font-medium tabular-nums">
+              {routinesDone} / {routines.length}
+            </span>
+          </div>
+          {routines.map((r, i) => (
+            <RoutineItem key={i} label={r.label} done={r.done} onToggle={() => toggleRoutine(i)} />
+          ))}
+        </div>
+        {/* Tasks */}
+        <span className="label-caps">today</span>
+        {tasks.map((task, i) => (
+          <TaskRow key={task.id} task={task} index={i} onToggle={toggleTask} />
+        ))}
+        {/* Score card */}
+        <div
+          className="mt-6 mb-4 p-6 text-center"
+          style={{
+            background: "hsl(var(--sage) / 0.35)",
+            borderRadius: "var(--card-radius)",
+            border: "var(--card-border)",
+            animation: "slideInUp 0.5s ease-out 0.7s both",
+          }}
+        >
+          <div className="font-display text-[3rem] leading-none mb-2 text-done-text" style={{ fontWeight: "var(--display-weight)" }}>
+            {score}%
+          </div>
+          <div className="text-[0.78rem] font-medium text-done-text/55 mb-1">today's score · 🔥 6-day streak</div>
+          <div className="text-[0.65rem] text-muted-foreground/40 italic">
+            {doneUrgent} urgent task{doneUrgent !== 1 ? "s" : ""} complete · +10 bonus points
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default TodayScreen;
+```
+### src/components/TaskRow.tsx
+```tsx
+import TaskCheckCircle from "./TaskCheckCircle";
+import type { TaskState } from "./TaskCheckCircle";
+export type TagType = "urgent" | "career" | "longterm" | "personal";
+export interface TaskData {
+  id: string;
+  title: string;
+  tag: TagType;
+  tagLabel: string;
+  state: TaskState;
+  time?: string;
+}
+const tagStyles: Record<TagType, string> = {
+  urgent: "bg-tag-urgent-bg text-tag-urgent-text",
+  career: "bg-tag-career-bg text-tag-career-text",
+  longterm: "bg-tag-longterm-bg text-tag-longterm-text",
+  personal: "bg-tag-personal-bg text-tag-personal-text",
+};
+const TaskRow = ({ task, index, onToggle }: { task: TaskData; index: number; onToggle: (id: string) => void }) => {
+  const isDone = task.state === "done";
+  const isStarted = task.state === "started";
+  const titleClass = isDone
+    ? "text-muted-foreground/40 italic"
+    : isStarted
+    ? "text-started-text font-semibold"
+    : "text-foreground";
+  return (
+    <div
+      className={`flex items-center gap-3.5 mb-3 cursor-pointer transition-all duration-200 active:scale-[0.98] ${
+        isDone ? "bg-sky/15" : "bg-card"
+      }`}
+      style={{
+        padding: "16px 18px",
+        borderRadius: "var(--card-radius)",
+        boxShadow: isDone ? "none" : "var(--shadow-elevated)",
+        border: isDone ? "0.5px solid rgba(0,0,0,0.04)" : "var(--card-border)",
+        animation: `slideInUp var(--anim-task-duration) ease-out both`,
+        animationDelay: `${0.1 + index * 0.07}s`,
+        opacity: isDone ? 0.7 : 1,
+      }}
+      onClick={() => onToggle(task.id)}
+    >
+      <TaskCheckCircle state={task.state} />
+      <div className="flex-1 min-w-0">
+        <div className={`text-[0.92rem] font-medium transition-colors duration-300 ${titleClass}`}>
+          {task.title}
+        </div>
+        {!isDone && (
+          <span
+            className={`inline-block mt-1.5 px-2 py-0.5 text-[0.58rem] font-semibold uppercase tracking-wider ${tagStyles[task.tag]}`}
+            style={{ borderRadius: "var(--tag-radius)" }}
+          >
+            {task.tagLabel}
+          </span>
+        )}
+      </div>
+      {task.time && !isDone && (
+        <div className="text-[0.68rem] text-muted-foreground/40 font-medium tabular-nums">{task.time}</div>
+      )}
+    </div>
+  );
+};
+export default TaskRow;
+export type { TaskState };
+```
+### src/components/TaskCheckCircle.tsx
+```tsx
+import { useEffect, useState, useRef } from "react";
+type TaskState = "untouched" | "started" | "done";
+const TaskCheckCircle = ({ state }: { state: TaskState }) => {
+  const [animate, setAnimate] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const prevState = useRef(state);
+  useEffect(() => {
+    if (state === "done" && prevState.current !== "done") {
+      setAnimate(true);
+      setShowConfetti(true);
+      const t1 = setTimeout(() => setAnimate(false), 400);
+      const t2 = setTimeout(() => setShowConfetti(false), 900);
+      prevState.current = state;
+      return () => { clearTimeout(t1); clearTimeout(t2); };
+    }
+    prevState.current = state;
+  }, [state]);
+  const circleBase = "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 relative transition-all";
+  return (
+    <div
+      className={`${circleBase} ${
+        state === "done"
+          ? "bg-done-fill"
+          : state === "started"
+          ? "border-[2px] border-started-border bg-started-border/8"
+          : "border-[1.5px] bg-card"
+      }`}
+      style={{
+        borderColor: state === "untouched" ? "rgba(0,0,0,0.15)" : undefined,
+        transitionDuration: "var(--anim-tick-duration)",
+        transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        transform: animate ? "scale(1.15)" : "scale(1)",
+      }}
+    >
+      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path
+          d="M20 6L9 17L4 12"
+          stroke={state === "done" ? "white" : state === "started" ? "hsl(var(--started-border))" : "transparent"}
+          strokeWidth={2.5}
+          strokeOpacity={state === "started" ? 0.5 : 1}
+          style={{
+            strokeDasharray: 20,
+            strokeDashoffset: state === "done" ? 0 : 20,
+            transition: "stroke-dashoffset 0.35s ease 0.05s",
+          }}
+        />
+      </svg>
+      {showConfetti && <ConfettiBurst />}
+    </div>
+  );
+};
+const ConfettiBurst = () => {
+  const colors = ["hsl(122,28%,84%)", "hsl(280,30%,89%)", "hsl(210,55%,88%)", "hsl(24,70%,90%)", "hsl(122,40%,45%)"];
+  const particles = Array.from({ length: 8 }, (_, i) => {
+    const angle = (Math.PI * 2 * i) / 8 + (Math.random() - 0.5) * 0.3;
+    const dist = 18 + Math.random() * 16;
+    return { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist, color: colors[i % colors.length], delay: i * 0.02, size: 2.5 + Math.random() * 2 };
+  });
+  return (
+    <>
+      {particles.map((p, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: p.size, height: p.size, backgroundColor: p.color,
+            left: "50%", top: "50%",
+            ["--x" as string]: `${p.x}px`, ["--y" as string]: `${p.y}px`,
+            animation: `burst 0.8s ease-out ${p.delay}s forwards`,
+          }}
+        />
+      ))}
+    </>
+  );
+};
+export default TaskCheckCircle;
+export type { TaskState };
+```
+### src/components/RoutineItem.tsx
+```tsx
+const RoutineItem = ({ label, done, onToggle }: { label: string; done: boolean; onToggle: () => void }) => (
+  <div className="flex items-center gap-3 mb-3.5 last:mb-0 cursor-pointer" onClick={onToggle}>
+    <div
+      className={`w-[17px] h-[17px] rounded-[4px] flex items-center justify-center transition-all duration-300 ${
+        done ? "bg-accent-foreground/10 border border-accent-foreground/15" : "bg-card/60"
+      }`}
+      style={{ border: done ? undefined : "1.5px solid rgba(0,0,0,0.1)" }}
+    >
+      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5">
+        <path
+          d="M20 6L9 17L4 12"
+          fill="none"
+          stroke="hsl(var(--accent-foreground))"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            strokeDasharray: 20,
+            strokeDashoffset: done ? 0 : 20,
+            transition: "stroke-dashoffset 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          }}
+        />
+      </svg>
+    </div>
+    <span className={`text-[0.82rem] font-medium transition-opacity duration-300 ${done ? "opacity-40" : "opacity-75"}`}>
+      {label}
+    </span>
+  </div>
+);
+export default RoutineItem;
+```
+### src/components/CarryForwardBanner.tsx
+```tsx
+import { useState } from "react";
+const CarryForwardBanner = () => {
+  const [phase, setPhase] = useState<"in" | "out" | "gone">("in");
+  const dismiss = () => {
+    setPhase("out");
+    setTimeout(() => setPhase("gone"), 350);
+  };
+  if (phase === "gone") return null;
+  return (
+    <div
+      className="mx-5 mb-5 p-4 overflow-hidden"
+      style={{
+        background: "hsl(var(--peach) / 0.55)",
+        borderRadius: "var(--card-radius)",
+        border: "var(--card-border)",
+        animation: phase === "in" ? "slideDown 0.3s ease-out both" : "slideUp 0.3s ease-in both",
+      }}
+    >
+      <h3 className="font-display italic text-sm mb-3 text-foreground/75">from yesterday</h3>
+      <div className="flex items-center gap-2.5 mb-2 text-[0.8rem] text-foreground/60">
+        <input type="checkbox" defaultChecked className="accent-foreground rounded" /> Update Q4 roadmap
+      </div>
+      <div className="flex items-center gap-2.5 mb-1 text-[0.8rem] text-foreground/60">
+        <input type="checkbox" defaultChecked className="accent-foreground rounded" /> Email feedback to Sarah
+      </div>
+      <div className="mt-3.5 flex items-center gap-4">
+        <button
+          onClick={dismiss}
+          className="bg-sage text-done-text px-4 py-1.5 text-[0.72rem] font-semibold transition-colors hover:bg-sage-mid/30"
+          style={{ borderRadius: "var(--pill-radius)" }}
+        >
+          Roll forward
+        </button>
+        <button onClick={dismiss} className="text-[0.72rem] text-muted-foreground/45 font-medium hover:text-muted-foreground transition-colors">
+          dismiss
+        </button>
+      </div>
+    </div>
+  );
+};
+export default CarryForwardBanner;
+```
+### src/components/BottomNav.tsx
+```tsx
+import { Home, BarChart3, Settings } from "lucide-react";
+type Tab = "today" | "dashboard" | "settings";
+const tabs: { id: Tab; label: string; icon: typeof Home }[] = [
+  { id: "today", label: "Today", icon: Home },
+  { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+  { id: "settings", label: "Settings", icon: Settings },
+];
+const BottomNav = ({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) => (
+  <nav
+    className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[420px] flex justify-around py-2 pb-7 z-50"
+    style={{
+      background: "hsl(var(--background) / 0.85)",
+      backdropFilter: "blur(24px)",
+      WebkitBackdropFilter: "blur(24px)",
+      borderTop: "0.5px solid rgba(0,0,0,0.06)",
+    }}
+  >
+    {tabs.map((tab) => (
+      <button
+        key={tab.id}
+        onClick={() => onChange(tab.id)}
+        className="relative flex flex-col items-center gap-0.5 px-5 py-2 text-[0.62rem] font-semibold tracking-wide transition-all"
+        style={{ transitionDuration: "var(--anim-nav-duration)" }}
+      >
+        {active === tab.id && (
+          <span
+            className="absolute inset-0 bg-lavender/50 rounded-2xl"
+            style={{ animation: "fadeIn 0.2s ease both" }}
+          />
+        )}
+        <tab.icon
+          className={`w-[17px] h-[17px] relative z-10 transition-colors ${
+            active === tab.id ? "text-foreground" : "text-muted-foreground/40"
+          }`}
+          strokeWidth={active === tab.id ? 2 : 1.6}
+        />
+        <span className={`relative z-10 ${active === tab.id ? "text-foreground/80" : "text-muted-foreground/40"}`}>
+          {tab.label}
+        </span>
+      </button>
+    ))}
+  </nav>
+);
+export default BottomNav;
+export type { Tab };
+```
+### src/components/DashboardScreen.tsx
+```tsx
+import { useMemo } from "react";
+const heatmapColors = [
+  "hsl(var(--cream))",
+  "hsl(var(--sage) / 0.5)",
+  "hsl(122, 30%, 66%)",
+  "hsl(122, 40%, 45%)",
+  "hsl(122, 38%, 33%)",
+];
+const generateHeatmap = () => {
+  const data: number[][] = [];
+  for (let w = 0; w < 5; w++) {
+    const week: number[] = [];
+    for (let d = 0; d < 7; d++) {
+      week.push(Math.floor(Math.random() * 5));
+    }
+    data.push(week);
+  }
+  return data;
+};
+const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
+const DashboardScreen = () => {
+  const heatmap = useMemo(generateHeatmap, []);
+  const today = new Date();
+  const sparkline = useMemo(() => Array.from({ length: 14 }, () => Math.random() > 0.3), []);
+  return (
+    <div className="px-5 pt-6">
+      <h2 className="font-display italic text-[1.35rem] text-foreground/80 mb-6" style={{ fontWeight: "var(--display-weight)" }}>
+        your journey
+      </h2>
+      {/* Calendar Heatmap */}
+      <div
+        className="mb-7 p-4"
+        style={{ background: "hsl(var(--card))", borderRadius: "var(--card-radius)", border: "var(--card-border)", boxShadow: "var(--shadow-card)" }}
+      >
+        <span className="label-caps">activity</span>
+        <div className="flex gap-0.5 justify-center mb-1">
+          {dayLabels.map((d, i) => (
+            <span key={i} className="w-8 text-center text-[0.55rem] text-muted-foreground/35 font-medium">{d}</span>
+          ))}
+        </div>
+        {heatmap.map((week, w) => (
+          <div key={w} className="flex gap-0.5 justify-center mb-0.5">
+            {week.map((val, d) => {
+              const isToday = w === 4 && d === today.getDay() - 1;
+              return (
+                <div
+                  key={d}
+                  className="w-8 h-8 rounded-[4px] transition-colors relative group"
+                  style={{
+                    background: heatmapColors[val],
+                    outline: isToday ? "2px solid hsl(122, 38%, 33%)" : "none",
+                    outlineOffset: "-1px",
+                    animation: `cellFade 0.3s ease-out ${(w * 7 + d) * 0.01}s both`,
+                  }}
+                  title={`Score: ${val * 25}%`}
+                />
+              );
+            })}
+          </div>
+        ))}
+        <div className="flex items-center gap-1 mt-3 justify-end">
+          <span className="text-[0.55rem] text-muted-foreground/35">less</span>
+          {heatmapColors.map((c, i) => (
+            <div key={i} className="w-3 h-3 rounded-[2px]" style={{ background: c, border: i === 0 ? "0.5px solid rgba(0,0,0,0.08)" : "none" }} />
+          ))}
+          <span className="text-[0.55rem] text-muted-foreground/35">more</span>
+        </div>
+      </div>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 gap-2.5 mb-7">
+        {[
+          { label: "Current streak", value: "6 days 🔥", bg: "hsl(var(--peach) / 0.4)" },
+          { label: "Avg score", value: "61%", bg: "hsl(var(--lavender) / 0.4)" },
+          { label: "Top tag", value: "Career · 18", bg: "hsl(var(--sky) / 0.4)" },
+          { label: "Routines", value: "78%", bg: "hsl(var(--sage) / 0.4)" },
+        ].map((stat, i) => (
+          <div
+            key={i}
+            className="p-4"
+            style={{
+              background: stat.bg,
+              borderRadius: "var(--card-radius)",
+              border: "var(--card-border)",
+              animation: `slideInUp 0.4s ease-out ${0.15 + i * 0.06}s both`,
+            }}
+          >
+            <div className="text-[0.6rem] text-muted-foreground/45 font-semibold tracking-wider uppercase mb-1.5">{stat.label}</div>
+            <div className="text-lg font-display text-foreground/75" style={{ fontWeight: "var(--display-weight)" }}>{stat.value}</div>
+          </div>
+        ))}
+      </div>
+      {/* Overflow insight */}
+      <div
+        className="mb-7 p-4"
+        style={{ background: "hsl(var(--muted))", borderRadius: "var(--card-radius)", border: "var(--card-border)", animation: "slideInUp 0.4s ease-out 0.5s both" }}
+      >
+        <p className="font-display italic text-[0.85rem] text-muted-foreground/60 leading-relaxed">
+          "avg 2.1 tasks carried forward per day this week"
+        </p>
+      </div>
+      {/* Routines Sparkline */}
+      <div
+        className="mb-6 p-4"
+        style={{ background: "hsl(var(--card))", borderRadius: "var(--card-radius)", border: "var(--card-border)", boxShadow: "var(--shadow-card)", animation: "slideInUp 0.4s ease-out 0.55s both" }}
+      >
+        <span className="label-caps">routines · 14 days</span>
+        <div className="flex items-center gap-0 justify-center mt-2">
+          {sparkline.map((done, i) => (
+            <div key={i} className="flex items-center">
+              <div
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${done ? "bg-sage-strong" : "bg-border"}`}
+                style={{ animation: `cellFade 0.3s ease-out ${i * 0.03}s both` }}
+              />
+              {i < sparkline.length - 1 && (
+                <div className="w-3 h-px bg-border/50" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+export default DashboardScreen;
+```
+### src/components/SettingsScreen.tsx
+```tsx
+import { useState } from "react";
+const SettingsScreen = () => {
+  const [confettiOn, setConfettiOn] = useState(true);
+  const routines = ["Walk 20 mins", "Read 5 pages", "Read all emails"];
+  const tags = [
+    { label: "Urgent", style: "bg-tag-urgent-bg text-tag-urgent-text" },
+    { label: "Great for Career", style: "bg-tag-career-bg text-tag-career-text" },
+    { label: "Long-term Goodness", style: "bg-tag-longterm-bg text-tag-longterm-text" },
+    { label: "Personal", style: "bg-tag-personal-bg text-tag-personal-text" },
+  ];
+  return (
+    <div className="px-5 pt-6" style={{ animation: "screenFade 0.2s ease both" }}>
+      <h2 className="font-display italic text-[1.35rem] text-foreground/80 mb-7" style={{ fontWeight: "var(--display-weight)" }}>
+        your space
+      </h2>
+      <div className="space-y-0">
+        {/* Confetti toggle */}
+        <div className="flex items-center justify-between py-4" style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+          <span className="text-sm text-foreground/70">Confetti on completion</span>
+          <button
+            onClick={() => setConfettiOn(!confettiOn)}
+            className="relative w-11 h-6 rounded-full transition-colors duration-200"
+            style={{ background: confettiOn ? "hsl(var(--done-fill))" : "hsl(var(--border))" }}
+          >
+            <span
+              className="absolute top-0.5 w-5 h-5 rounded-full bg-card shadow-sm transition-transform duration-200"
+              style={{ left: confettiOn ? "calc(100% - 22px)" : "2px" }}
+            />
+          </button>
+        </div>
+        {/* Routines */}
+        <div className="py-4" style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+          <div className="flex justify-between items-center mb-2.5">
+            <span className="text-sm text-foreground/70">Routine tasks</span>
+            <span className="text-[0.7rem] text-muted-foreground/40 font-medium cursor-pointer hover:text-muted-foreground transition-colors">edit</span>
+          </div>
+          <div className="space-y-1.5">
+            {routines.map((r, i) => (
+              <div key={i} className="text-[0.8rem] text-muted-foreground/55 pl-1">{r}</div>
+            ))}
+          </div>
+        </div>
+        {/* Tags */}
+        <div className="py-4" style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+          <div className="flex justify-between items-center mb-2.5">
+            <span className="text-sm text-foreground/70">Tags</span>
+            <span className="text-[0.7rem] text-muted-foreground/40 font-medium cursor-pointer hover:text-muted-foreground transition-colors">edit</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((t, i) => (
+              <span
+                key={i}
+                className={`px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-wider ${t.style}`}
+                style={{ borderRadius: "var(--tag-radius)" }}
+              >
+                {t.label}
+              </span>
+            ))}
+          </div>
+        </div>
+        {/* Google Sheet */}
+        <div className="py-4" style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+          <a href="#" className="text-sm text-foreground/70 flex items-center gap-1.5 hover:text-foreground transition-colors">
+            Google Sheet
+            <span className="text-[0.7rem] text-muted-foreground/40">view your data ↗</span>
+          </a>
+        </div>
+        {/* Sign out */}
+        <div className="py-4">
+          <button className="text-sm text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+            Sign out
+          </button>
+        </div>
+      </div>
+      {/* Version */}
+      <div className="text-center mt-12 mb-8">
+        <p className="font-display italic text-[0.65rem] text-muted-foreground/30">
+          AllDone v0.1 · phase 0 · made with love
+        </p>
+      </div>
+    </div>
+  );
+};
+export default SettingsScreen;
+```
+---
+## Tech Stack
+- **Framework**: React 18 + TypeScript
+- **Build**: Vite
+- **Styling**: Tailwind CSS with CSS custom properties for theming
+- **Icons**: Lucide React
+- **UI Components**: shadcn/ui (Radix primitives)
+- **Animations**: Pure CSS keyframes + inline transitions

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllDone | Premium Task Tracking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-cream: #FAF8F4;
+            --glass-white: rgba(255, 255, 255, 0.7);
+            --sage-accent: #6B8E23; /* Olive/Sage with more depth */
+            --lavender-deep: #5E35B1;
+            --peach-dark: #D84315;
+            
+            --text-main: #1A1A1A;
+            --text-muted: #616161;
+            
+            --urgent-bg: #FBE9E7; --urgent-text: #BF360C;
+            --career-bg: #E3F2FD; --career-text: #0D47A1;
+            --goodness-bg: #F3E5F5; --goodness-text: #4A148C;
+
+            --radius-card: 20px;
+            --shadow-elegant: 0 10px 30px -10px rgba(0,0,0,0.08);
+            --transition-fluid: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #F0F0F0;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--bg-cream);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.15);
+        }
+
+        /* Sophisticated Header */
+        .header {
+            padding: 40px 24px 20px;
+            background: linear-gradient(to bottom, var(--bg-cream) 70%, rgba(250, 248, 244, 0));
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 800;
+            font-style: italic;
+            letter-spacing: -1.5px;
+            color: var(--text-main);
+        }
+
+        .date {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .pill {
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .score-pill { background: #E8F5E9; color: #2E7D32; }
+        .streak-pill { background: #FFF3E0; color: #E65100; }
+
+        /* Carry Forward Banner - Elegant Glass */
+        .banner {
+            margin: 0 24px 32px;
+            padding: 24px;
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-elegant);
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        /* Task List Layout */
+        .scroll-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 24px 120px;
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin: 32px 0 16px 4px;
+            text-transform: uppercase;
+        }
+
+        /* Task Cards */
+        .task-card {
+            background: white;
+            border-radius: var(--radius-card);
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            border: 1px solid transparent;
+            transition: var(--transition-fluid);
+            animation: fadeIn 0.6s ease backwards;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+            border-color: rgba(0,0,0,0.03);
+        }
+
+        /* Checkbox Mechanics */
+        .check-orbit {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1.5px solid #DDD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-fluid);
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .state-started .check-orbit { border-color: #FF8F00; border-width: 2.5px; }
+        .state-done .check-orbit { background: var(--sage-accent); border-color: var(--sage-accent); }
+
+        .task-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--text-main);
+            transition: var(--transition-fluid);
+        }
+
+        .state-done .task-title {
+            color: var(--text-muted);
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .tag {
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Navigation Glass */
+        .nav-bar {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 35px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .nav-item.active { color: var(--text-main); }
+        .nav-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--text-main);
+            border-radius: 50%;
+            margin-top: 4px;
+            opacity: 0;
+            transform: scale(0);
+            transition: 0.3s;
+        }
+        .nav-item.active .nav-dot { opacity: 1; transform: scale(1); }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header class="header">
+        <div class="header-top">
+            <div>
+                <h1 class="logo">AllDone.</h1>
+                <div class="date">March 17, 2026</div>
+            </div>
+            <div class="pill score-pill" id="score">Score: 72%</div>
+        </div>
+        <div class="stats-row">
+            <div class="pill streak-pill">🔥 6 DAY STREAK</div>
+        </div>
+    </header>
+
+    <div class="scroll-view">
+        <div class="banner" id="banner">
+            <p style="font-weight: 700; margin-bottom: 8px;">Morning, Sarah.</p>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">You have 2 items left over from yesterday. Ready to finish them?</p>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <button onclick="dismiss()" style="background: var(--text-main); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: 700; cursor: pointer;">Roll Forward</button>
+                <button onclick="dismiss()" style="background: transparent; border: none; color: var(--text-muted); font-weight: 500; cursor: pointer;">Dismiss</button>
+            </div>
+        </div>
+
+        <div class="section-header">Routines</div>
+        <div class="task-card state-untouched" style="background: #F3E5F5; border: none;">
+            <div class="check-orbit"></div>
+            <div class="task-title" style="font-size: 15px;">Deep Work: 90 mins</div>
+        </div>
+
+        <div class="section-header">Today</div>
+        
+        <div class="task-card state-done" style="animation-delay: 0.1s;">
+            <div class="check-orbit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg></div>
+            <div class="task-content">
+                <div class="task-title">Local MOJ Strategy</div>
+                <div class="tag tag-urgent" style="margin-top: 6px; display: inline-block;">Urgent</div>
+            </div>
+        </div>
+
+        <div class="task-card state-started" style="animation-delay: 0.2s;">
+            <div class="check-orbit"></div>
+            <div class="task-content">
+                <div class="task-title">MBR deck refinement</div>
+                <div class="tag tag-career" style="margin-top: 6px; display: inline-block;">Career</div>
+            </div>
+        </div>
+
+        <div class="task-card state-untouched" style="animation-delay: 0.3s;">
+            <div class="check-orbit"></div>
+            <div class="task-content">
+                <div class="task-title">Governance documentation</div>
+                <div class="tag tag-goodness" style="margin-top: 6px; display: inline-block;">Goodness</div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="#" class="nav-item active">Today<div class="nav-dot"></div></a>
+        <a href="#" class="nav-item">Insights<div class="nav-dot"></div></a>
+        <a href="#" class="nav-item">Settings<div class="nav-dot"></div></a>
+    </nav>
+</div>
+
+<script>
+    function dismiss() {
+        const b = document.getElementById('banner');
+        b.style.opacity = '0';
+        b.style.transform = 'scale(0.95)';
+        setTimeout(() => b.remove(), 500);
+    }
+
+    document.querySelectorAll('.task-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const orbit = this.querySelector('.check-orbit');
+            
+            if (this.classList.contains('state-untouched')) {
+                this.classList.replace('state-untouched', 'state-started');
+            } else if (this.classList.contains('state-started')) {
+                this.classList.replace('state-started', 'state-done');
+                orbit.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>';
+                createConfetti(orbit);
+            } else {
+                this.classList.replace('state-done', 'state-untouched');
+                orbit.innerHTML = '';
+            }
+        });
+    });
+
+    function createConfetti(el) {
+        for(let i=0; i<12; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = '50%';
+            c.style.top = '50%';
+            c.style.backgroundColor = ['#6B8E23', '#5E35B1', '#FFD700'][Math.floor(Math.random()*3)];
+            const x = (Math.random() - 0.5) * 100;
+            const y = (Math.random() - 0.5) * 100;
+            el.appendChild(c);
+            c.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${x}px, ${y}px) scale(0)`, opacity: 0 }
+            ], { duration: 800, easing: 'cubic-bezier(0.1, 1, 0.1, 1)' });
+            setTimeout(() => c.remove(), 800);
+        }
+    }
+</script>
+</body>
+</html>
